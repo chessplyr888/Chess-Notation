@@ -28,14 +28,16 @@ while(True):
 	# img = frame
 
 	# findChessboardCorners + drawChessboardCorners
+	# When finding corners, performance takes a major hit -> fps drops
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
 	print found, corners
 
-	cv2.drawChessboardCorners(frame, pattern_size, corners, found)
-	
+	if found is True:
+		cv2.drawChessboardCorners(frame, pattern_size, corners, found)
 
 	# Display the resulting frame
-	cv2.imshow('frame',img)
+	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
+	cv2.imshow('frame', frame)
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break
 
