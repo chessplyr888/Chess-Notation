@@ -5,27 +5,44 @@ cap = cv2.VideoCapture(0)
 
 pattern_size = (7,7) # Inner corners of a chessboard
 
+def getEdgeCorners(corners):
+	changeInX = corners[6[0]] - corners[0[0]]
+	changeInY = corners[6[1]] - corners[0[1]]
+
+	avgX = changeInX/7
+	avgY = changeInY/7
+
+	# Return a list of edges on opposite sides
+	return [[corners[0[0]] - avgX, corners[0[1]] - avgY], [corners[6[0]] + avgX, corners[6[1]] + avgY]]
+
+def edgeCorners(corners):
+	# Extrapolate rows row0 - row6
+	for i in range(0,6):
+		corners.append(getEdgeCorners(corners[0 + 7*i:6 + 7*i]))
+
+	# Resort the list
+	corners.sort()
+
+	# Extrapolate cols col0 - col8
+	for i in range(0,8): # Number of columns
+		col = []
+		for j in enumerate(corners):
+			if j % 10 is i:
+				col.append(corners[j])
+		corners.append(getEdgeCorners(col))
+
+	# Final resort
+	corners.sort()
+
+	return corners
+
+
 while(True):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
 
 	# Our operations on the frame come here
 	base = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-	
-	# Canny Edge Detector
-	# img = cv2.Canny(base,100,200)
-	
-	# SIFT
-	# sift = cv2.SIFT()
-	# keypoints = sift.detect(base, None)
-	# img = cv2.drawKeypoints(base, keypoints)
-
-	# Harris Corner Detector
-	# base = np.float32(base) # Convert to float32 for cornerHarris
-	# corner = cv2.cornerHarris(base, 2, 3, 0.04)
-	# corner = cv2.dilate(corner, None) # Dilute to easily identify corners
-	# frame[corner > 0.05*corner.max()] = [0, 0, 255]
-	# img = frame
 
 	# findChessboardCorners + drawChessboardCorners
 	# When finding corners, performance takes a major hit -> fps drops
