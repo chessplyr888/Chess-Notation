@@ -18,7 +18,7 @@ def getEdgeCorners(corners):
 def edgeCorners(corners):
 	# Extrapolate rows row0 - row6
 	for i in range(0,6):
-		corners.append(getEdgeCorners(corners[0 + 7*i:6 + 7*i]))
+		corners.extend(getEdgeCorners(corners[0 + 7*i:6 + 7*i]))
 
 	# Resort the list
 	corners.sort()
@@ -29,7 +29,7 @@ def edgeCorners(corners):
 		for j in enumerate(corners):
 			if j % 10 is i:
 				col.append(corners[j])
-		corners.append(getEdgeCorners(col))
+		corners.extend(getEdgeCorners(col))
 
 	# Final resort
 	corners.sort()
