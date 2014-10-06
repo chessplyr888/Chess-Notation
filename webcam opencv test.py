@@ -1,9 +1,12 @@
 import numpy as np
 import cv2
 
-cap = cv2.VideoCapture(0)
-
-pattern_size = (7,7) # Inner corners of a chessboard
+class Square(object):
+	"""docstring for Square"""
+	def __init__(self, corners):
+		super(Square, self).__init__()
+		self.boxCorners[] = corners 
+		
 
 def getEdgeCorners(corners):
 	changeInX = corners[6[0]] - corners[0[0]]
@@ -36,6 +39,10 @@ def edgeCorners(corners):
 
 	return corners
 
+
+cap = cv2.VideoCapture(0)
+
+pattern_size = (7,7) # Inner corners of a chessboard
 
 while(True):
 	# Capture frame-by-frame
