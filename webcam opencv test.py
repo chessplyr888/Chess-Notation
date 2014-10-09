@@ -8,6 +8,9 @@ class Square(object):
 		self.boxCorners[] = corners 
 		
 
+# TODO Change extends to insert
+# This must happen because if the board is oriented diagonally, the sort method would break
+
 def getEdgeCorners(corners):
 	changeInX = corners[6[0]] - corners[0[0]]
 	changeInY = corners[6[1]] - corners[0[1]]
