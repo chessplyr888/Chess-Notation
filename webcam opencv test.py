@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
 
+
+# Square Class TODO Later
 class Square(object):
 	"""docstring for Square"""
 	def __init__(self, corners):
@@ -33,15 +35,11 @@ def edgeCorners(corners):
 		rows[i].extend(temp[1])
 
 	# Extrapolate cols col0 - col8
+	cols = []
 	for i in range(0,8): # Number of columns
-		col = []
 		for j in enumerate(corners):
 			if j % 10 is i:
-				col.append(corners[j])
-		corners.extend(getEdgeCorners(col))
-
-	# Final resort
-	corners.sort()
+				cols[i].append(corners[j])
 
 	return corners
 
