@@ -23,11 +23,14 @@ def getEdgeCorners(corners):
 
 def edgeCorners(corners):
 	# Extrapolate rows row0 - row6
+	rows = []
 	for i in range(0,6):
-		corners.extend(getEdgeCorners(corners[0 + 7*i:6 + 7*i]))
+		rows.append((corners[0 + 7*i:6 + 7*i]))
 
-	# Resort the list
-	corners.sort()
+	for i in enumerate(rows):
+		temp = getEdgeCorners(rows[i])
+		rows[i].insert(0, temp[0])
+		rows[i].extend(temp[1])
 
 	# Extrapolate cols col0 - col8
 	for i in range(0,8): # Number of columns
