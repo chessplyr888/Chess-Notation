@@ -2,16 +2,6 @@ import numpy as np
 import cv2
 
 
-# Square Class TODO Later
-class Square(object):
-	"""docstring for Square"""
-	def __init__(self, corners):
-		super(Square, self).__init__()
-		self.boxCorners[] = corners 
-		
-
-# TODO Change extends to insert
-# This must happen because if the board is oriented diagonally, the sort method would break
 
 def getEdgeCorners(corners):
 	changeInX = corners[6[0]] - corners[0[0]]
@@ -40,6 +30,11 @@ def edgeCorners(corners):
 		for j in enumerate(corners):
 			if j % 10 is i:
 				cols[i].append(corners[j])
+
+	for i in enumerate(cols):
+		temp = getEdgeCorners(cols[i])
+		cols[i].insert(0, temp[0])
+		cols[i].extend(temp[1])
 
 	return corners
 
