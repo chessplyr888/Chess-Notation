@@ -1,8 +1,6 @@
 import numpy as np
 import cv2
 
-
-
 def getEdgeCorners(corners):
 	changeInX = corners[6[0]] - corners[0[0]]
 	changeInY = corners[6[1]] - corners[0[1]]
