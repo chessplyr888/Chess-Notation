@@ -33,7 +33,7 @@ def edgeCorners(corners):
 	cols = []
 	for i in range(0,8): # Number of columns
 		cols[i] = []
-		for j in enumerate(rows)
+		for j in enumerate(rows):
 			cols[i].append(rows[j][i])
 
 	for i in enumerate(cols):
@@ -43,8 +43,8 @@ def edgeCorners(corners):
 
 	# Consolidate cols into newCorners
 	newCorners = []
-	for i in range(0,8)
-		for j in enumerate(cols)
+	for i in range(0,8):
+		for j in enumerate(cols):
 			newCorners.append(cols[j][i])
 
 	return newCorners
