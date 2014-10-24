@@ -1,6 +1,6 @@
 # TEST.PY IS A FILE FOR TESTING ALGORITHMS ON A SINGLE STATIC IMAGE INSTEAD OF A WEBCAM
 
-
+# NEEDS TO BASED OFF TUPLES LOOK AT THE MATRIX FORMAT
 
 
 import numpy as np
@@ -13,12 +13,12 @@ def getEdgeCorners(corners):
 	length = len(corners)
 	last = length - 1
 
-	print corners[0]
+	print corners[0][0][0]
 
-	changeInX = corners[[last][0]] - corners[[0][0]]
-	changeInY = corners[[last][1]] - corners[[0][1]]
+	changeInX = corners[last][0][0] - corners[0][0][0]
+	changeInY = corners[last][0][1] - corners[0][0][1]
 
-	print corners[[last][0]]
+	print changeInX, changeInY
 
 	avgX = changeInX/len(corners)
 	avgY = changeInY/len(corners)
