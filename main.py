@@ -1,16 +1,23 @@
 import numpy as np
 import cv2
 
-def getEdgeCorners(corners):
-	changeInX = corners[6[0]] - corners[0[0]]
-	changeInY = corners[6[1]] - corners[0[1]]
 
-	avgX = changeInX/7
-	avgY = changeInY/7
+
+# Return the left and right edges of a given row/col
+def getEdgeCorners(corners):
+	length = len(corners)
+	last = length - 1
+
+	changeInX = corners[last[0]] - corners[0[0]]
+	changeInY = corners[last[1]] - corners[0[1]]
+
+	avgX = changeInX/len(corners)
+	avgY = changeInY/len(corners)
 
 	# Return a list of edges on opposite sides
-	return [[corners[0[0]] - avgX, corners[0[1]] - avgY], [corners[6[0]] + avgX, corners[6[1]] + avgY]]
+	return [[corners[0[0]] - avgX, corners[0[1]] - avgY], [corners[last[0]] + avgX, corners[last[1]] + avgY]]
 
+# Return a list of all the corers, including the edges of the board
 def edgeCorners(corners):
 	# Extrapolate rows row0 - row6
 	rows = []
@@ -25,16 +32,22 @@ def edgeCorners(corners):
 	# Extrapolate cols col0 - col8
 	cols = []
 	for i in range(0,8): # Number of columns
-		for j in enumerate(corners):
-			if j % 10 is i:
-				cols[i].append(corners[j])
+		cols[i] = []
+		for j in enumerate(rows)
+			cols[i].append(rows[j][i])
 
 	for i in enumerate(cols):
 		temp = getEdgeCorners(cols[i])
 		cols[i].insert(0, temp[0])
 		cols[i].extend(temp[1])
 
-	return corners
+	# Consolidate cols into newCorners
+	newCorners = []
+	for i in range(0,8)
+		for j in enumerate(cols)
+			newCorners.append(cols[j][i])
+
+	return newCorners
 
 
 cap = cv2.VideoCapture(0)
@@ -53,8 +66,10 @@ while(True):
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
 	print found, corners
 
+	fullCorners = edgeCorners(corners)
+
 	if found is True:
-		cv2.drawChessboardCorners(frame, pattern_size, corners, found)
+		cv2.drawChessboardCorners(frame, pattern_size, fullCorners, found)
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
