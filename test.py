@@ -9,24 +9,40 @@ import cv2
 
 
 # Return the left and right edges of a given row/col
-def getEdgeCorners(corners):
+def getEdgeCornersRows(corners):
 	length = len(corners)
 	last = length - 1
+
+	# print corners
 
 	changeInX = corners[last][0][0] - corners[0][0][0]
 	changeInY = corners[last][0][1] - corners[0][0][1]
 
 	# print changeInX, changeInY, (changeInY/changeInX)
 
-	avgX = changeInX/len(corners)
-	avgY = changeInY/len(corners)
+	avgX = changeInX/length
+	avgY = changeInY/length
 
 	# Return a list of edges on opposite sides
 	return [[corners[0][0][0] - avgX, corners[0][0][1] - avgY], [corners[last][0][0] + avgX, corners[last][0][1] + avgY]]
 
+def getEdgeCornersCols(corners):
+	length = len(corners)
+	last = length - 1
+
+	changeInX = corners[last][0] - corners[0][0]
+	changeInY = corners[last][1] - corners[0][1]
+
+	avgX = changeInX/length
+	avgY = changeInY/length
+
+	return [[corners[0][0] - avgX, corners[0][1] - avgY], [corners[last][0] + avgX, corners[last][1] + avgY]]
+
 # Return a list of all the corers, including the edges of the board
 def edgeCorners(corners):
 	newCorners = []
+
+	print "ROWS"
 
 	# print corners.shape, corners.ndim
 
@@ -38,12 +54,12 @@ def edgeCorners(corners):
 
 	# print rows[0].shape, rows[0].ndim
 
-	# print rows[0][0]
+	# print rows
 
 	newRows = []
 
 	for i in range(0, len(rows)):
-		temp = getEdgeCorners(rows[i])
+		temp = getEdgeCornersRows(rows[i])
 		# print temp[0]
 		newRows.append(temp[0])
 		for j in range(0, len(rows[i])):
@@ -54,28 +70,38 @@ def edgeCorners(corners):
 	# print newRows, len(newRows)
 
 	# Extrapolate cols col0 - col8
+
+	print "COLS"
+
 	cols = []
-	for i in range(0, 7):
+	for i in range(0, 9):
 		temp = []
 		for j in range(0, len(newRows)):
 			if j % 9 is i:
 				temp.append((newRows[j]))
 		cols.append(temp)
 
-	print cols
-
 	for i in range(0, len(cols)):
-		temp = getEdgeCorners(cols[i])
+		# print "before", cols[i], len(cols[i])
+		temp = getEdgeCornersCols(cols[i])
+		# print temp
 		cols[i].insert(0, temp[0])
-		cols[i].extend(temp[1])
+		cols[i].append(temp[1])
+		# print "after", cols[i], len(cols[i])
 
 	# Convert newCorners to numpy array
 	
-	for i in range(0,8):
-		for j in range(0, len(cols)):
-			newCorners.append(cols[j][i])
+	print len(cols), len(cols[0])
 
-	return newCorners
+	for i in range(0, len(cols)):
+		for j in range(0, len(cols[i])):
+			newCorners.append(cols[i][j])
+
+	# print newCorners, len(newCorners)
+
+	fullCorners = np.array(newCorners)
+
+	return fullCorners
 
 
 
