@@ -13,21 +13,21 @@ def getEdgeCorners(corners):
 	length = len(corners)
 	last = length - 1
 
-	print corners[0][0][0]
-
 	changeInX = corners[last][0][0] - corners[0][0][0]
 	changeInY = corners[last][0][1] - corners[0][0][1]
 
-	print changeInX, changeInY
+	print changeInX, changeInY, (changeInY/changeInX)
 
 	avgX = changeInX/len(corners)
 	avgY = changeInY/len(corners)
 
 	# Return a list of edges on opposite sides
-	return [(corners[0][0][0] - avgX, corners[0][0][1] - avgY), (corners[last][0][0] + avgX, corners[last][0][1] + avgY)]
+	return [[corners[0][0][0] - avgX, corners[0][0][1] - avgY], [corners[last][0][0] + avgX, corners[last][0][1] + avgY]]
 
 # Return a list of all the corers, including the edges of the board
 def edgeCorners(corners):
+	newCorners = []
+
 	print corners.shape, corners.ndim
 
 	# Extrapolate rows row0 - row6
@@ -38,11 +38,20 @@ def edgeCorners(corners):
 
 	print rows[0].shape, rows[0].ndim
 
+	# print rows[0][0]
+
+	newRows = []
+
 	for i in range(0, len(rows)):
-		print rows[i]
 		temp = getEdgeCorners(rows[i])
-		rows[i].insert(0, temp[0])
-		rows[i].extend(temp[1])
+		print temp[0]
+		newRows.append(temp[0])
+		for j in range(0, len(rows[i])):
+			# print rows[i][j][0]
+			newRows.append([rows[i][j][0][0], rows[i][j][0][1]])
+		newRows.append(temp[1])
+
+	print newRows, len(newRows)
 
 	# Extrapolate cols col0 - col8
 	cols = []
@@ -56,8 +65,8 @@ def edgeCorners(corners):
 		cols[i].insert(0, temp[0])
 		cols[i].extend(temp[1])
 
-	# Consolidate cols into newCorners
-	newCorners = []
+	# Convert newCorners to numpy array
+	
 	for i in range(0,8):
 		for j in range(0, len(cols)):
 			newCorners.append(cols[j][i])
