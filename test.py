@@ -16,7 +16,7 @@ def getEdgeCorners(corners):
 	changeInX = corners[last][0][0] - corners[0][0][0]
 	changeInY = corners[last][0][1] - corners[0][0][1]
 
-	print changeInX, changeInY, (changeInY/changeInX)
+	# print changeInX, changeInY, (changeInY/changeInX)
 
 	avgX = changeInX/len(corners)
 	avgY = changeInY/len(corners)
@@ -28,7 +28,7 @@ def getEdgeCorners(corners):
 def edgeCorners(corners):
 	newCorners = []
 
-	print corners.shape, corners.ndim
+	# print corners.shape, corners.ndim
 
 	# Extrapolate rows row0 - row6
 	rows = []
@@ -36,7 +36,7 @@ def edgeCorners(corners):
 		rows.append((corners[0 + 7*i:7 + 7*i]))
 		# print corners[0 + 7*i:7 + 7*i]
 
-	print rows[0].shape, rows[0].ndim
+	# print rows[0].shape, rows[0].ndim
 
 	# print rows[0][0]
 
@@ -44,21 +44,25 @@ def edgeCorners(corners):
 
 	for i in range(0, len(rows)):
 		temp = getEdgeCorners(rows[i])
-		print temp[0]
+		# print temp[0]
 		newRows.append(temp[0])
 		for j in range(0, len(rows[i])):
 			# print rows[i][j][0]
 			newRows.append([rows[i][j][0][0], rows[i][j][0][1]])
 		newRows.append(temp[1])
 
-	print newRows, len(newRows)
+	# print newRows, len(newRows)
 
 	# Extrapolate cols col0 - col8
 	cols = []
-	for i in range(0,8): # Number of columns
-		cols[i] = []
-		for j in range(0, len(rows)):
-			cols[i].append(rows[j][i])
+	for i in range(0, 7):
+		temp = []
+		for j in range(0, len(newRows)):
+			if j % 9 is i:
+				temp.append((newRows[j]))
+		cols.append(temp)
+
+	print cols
 
 	for i in range(0, len(cols)):
 		temp = getEdgeCorners(cols[i])
