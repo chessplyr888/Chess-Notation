@@ -24,17 +24,19 @@ def getEdgeCorners(corners):
 	avgY = changeInY/len(corners)
 
 	# Return a list of edges on opposite sides
-	return [[corners[[0][0]] - avgX, corners[[0][1]] - avgY], [corners[[last][0]] + avgX, corners[[last][1]] + avgY]]
+	return [(corners[0][0][0] - avgX, corners[0][0][1] - avgY), (corners[last][0][0] + avgX, corners[last][0][1] + avgY)]
 
 # Return a list of all the corers, including the edges of the board
 def edgeCorners(corners):
-	
-	# print corners
+	print corners.shape, corners.ndim
+
 	# Extrapolate rows row0 - row6
 	rows = []
 	for i in range(0,7):
 		rows.append((corners[0 + 7*i:7 + 7*i]))
-	# print rows
+		# print corners[0 + 7*i:7 + 7*i]
+
+	print rows[0].shape, rows[0].ndim
 
 	for i in range(0, len(rows)):
 		print rows[i]
