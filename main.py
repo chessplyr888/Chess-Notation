@@ -147,9 +147,14 @@ while(True):
 		fullCorners = edgeCorners(corners)
 		# print corners.shape, corners.ndim, fullCorners, fullCorners.shape, fullCorners.ndim
 		# Change shape from (1, 81, 2) to (81, 1, 2)
-		fullCorners.shape = (81, 1, 2)
-		print fullCorners, fullCorners.shape, fullCorners.ndim
-		cv2.drawChessboardCorners(frame, full_pattern_size, fullCorners, found)
+		# fullCorners.shape = (81, 1, 2)
+		# print fullCorners, fullCorners.shape, fullCorners.ndim
+		# cv2.drawChessboardCorners(frame, full_pattern_size, fullCorners, found)
+
+		# Attempt without drawChessboardCorners, manually drawing the corners
+		for i in fullCorners:
+			x, y = i.ravel()
+			cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
