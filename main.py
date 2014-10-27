@@ -47,7 +47,12 @@ def getEdgeCornersCols(corners):
 	avgX = changeInX/length
 	avgY = changeInY/length
 
-	return [[corners[0][0] - avgX, corners[0][1] - avgY], [corners[last][0] + avgX, corners[last][1] + avgY]]
+	lowX = checkBounds("x", corners[0][0] - avgX)
+	lowY = checkBounds("y", corners[0][1] - avgY)
+	highX = checkBounds("x", corners[last][0] + avgX)
+	highY = checkBounds("y", corners[last][1] + avgY)
+
+	return [lowX, lowY], [highX, highY]
 
 # Return a list of all the corers, including the edges of the board
 def edgeCorners(corners):
@@ -102,7 +107,7 @@ def edgeCorners(corners):
 
 	# Convert newCorners to numpy array
 	
-	print len(cols), len(cols[0])
+	# print len(cols), len(cols[0])
 
 	for i in range(0, len(cols)):
 		for j in range(0, len(cols[i])):
@@ -120,6 +125,7 @@ cap = cv2.VideoCapture(0)
 print cap.get(3), cap.get(4)
 
 pattern_size = (7,7) # Inner corners of a chessboard
+full_pattern_size = (9,9) # All corners of a chessboard
 
 while(True):
 	# Capture frame-by-frame
@@ -138,8 +144,8 @@ while(True):
 		fullCorners = edgeCorners(corners)
 		# print corners.shape, corners.ndim, fullCorners, fullCorners.shape, fullCorners.ndim
 		fullCorners.shape = (81, 1, 2)
-		print fullCorners, fullCorners.shape
-		cv2.drawChessboardCorners(frame, (9,9), fullCorners, found)
+		print fullCorners, fullCorners.shape, fullCorners.ndim
+		cv2.drawChessboardCorners(frame, full_pattern_size, fullCorners, found)
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
