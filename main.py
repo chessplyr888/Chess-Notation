@@ -152,9 +152,15 @@ while(True):
 		# cv2.drawChessboardCorners(frame, full_pattern_size, fullCorners, found)
 
 		# Attempt without drawChessboardCorners, manually drawing the corners
-		for i in fullCorners:
-			x, y = i.ravel()
-			cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
+		# for i in fullCorners:
+		# 	x, y = i.ravel()
+		# 	cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
+
+		for i in range(0, len(fullCorners)):
+			x = fullCorners[i][0][0]
+			y = fullCorners[i][0][1]
+			cv2.circle(frame. (x, y), 3, (0, 255, 0), -1)
+
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
