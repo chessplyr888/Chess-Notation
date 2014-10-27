@@ -158,10 +158,11 @@ while(True):
 		# 	x, y = i.ravel()
 		# 	cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
 
-		for i in range(0, len(fullCorners)):
-			x = fullCorners[i][0][0]
-			y = fullCorners[i][0][1]
-			cv2.circle(frame. (x, y), 3, (0, 255, 0), -1)
+		for i in range(0, len(fullCorners[0])):
+			print fullCorners[0][i]
+			x = int(fullCorners[0][i][0])
+			y = int(fullCorners[0][i][1])
+			cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
 
 
 	# Display the resulting frame
