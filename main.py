@@ -2,6 +2,17 @@ import numpy as np
 import cv2
 
 
+def checkBounds(axis, val):
+	if val < 0:
+			return 0
+	if axis is "x":
+		if val > cap.get(3):
+			return cap.get(3)
+	if axis is "y":
+		if val > cap.get(4):
+			return cap.get(4)
+	return val
+
 
 # Return the left and right edges of a given row/col
 def getEdgeCornersRows(corners):
@@ -18,8 +29,13 @@ def getEdgeCornersRows(corners):
 	avgX = changeInX/length
 	avgY = changeInY/length
 
+	lowX = checkBounds("x", corners[0][0][0] - avgX)
+	lowY = checkBounds("y", corners[0][0][1] - avgY)
+	highX = checkBounds("x", corners[last][0][0] + avgX)
+	highY = checkBounds("y", corners[last][0][1] + avgY)
+
 	# Return a list of edges on opposite sides
-	return [[corners[0][0][0] - avgX, corners[0][0][1] - avgY], [corners[last][0][0] + avgX, corners[last][0][1] + avgY]]
+	return [[lowX, lowY], [highX, highY]]
 
 def getEdgeCornersCols(corners):
 	length = len(corners)
@@ -94,13 +110,14 @@ def edgeCorners(corners):
 
 	# print newCorners, len(newCorners)
 
-	fullCorners = np.array(newCorners)
+	fullCorners = np.array([newCorners])
 
 	return fullCorners
 
 
 
 cap = cv2.VideoCapture(0)
+print cap.get(3), cap.get(4)
 
 pattern_size = (7,7) # Inner corners of a chessboard
 
@@ -119,6 +136,9 @@ while(True):
 
 	if found is True:
 		fullCorners = edgeCorners(corners)
+		# print corners.shape, corners.ndim, fullCorners, fullCorners.shape, fullCorners.ndim
+		fullCorners.shape = (81, 1, 2)
+		print fullCorners, fullCorners.shape
 		cv2.drawChessboardCorners(frame, (9,9), fullCorners, found)
 
 	# Display the resulting frame
