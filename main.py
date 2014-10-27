@@ -14,7 +14,7 @@ def checkBounds(axis, val):
 	return val
 
 
-# Return the left and right edges of a given row/col
+# Return the left/right or top/bottom edges of a given row/col
 def getEdgeCornersRows(corners):
 	length = len(corners)
 	last = length - 1
@@ -52,10 +52,12 @@ def getEdgeCornersCols(corners):
 	highX = checkBounds("x", corners[last][0] + avgX)
 	highY = checkBounds("y", corners[last][1] + avgY)
 
+	# Return a list of edges on opposite sides
 	return [lowX, lowY], [highX, highY]
 
 # Return a list of all the corers, including the edges of the board
 def edgeCorners(corners):
+	# Corners should be an nparray of shape (49, 1, 2)
 	newCorners = []
 
 	print "ROWS"
@@ -117,6 +119,7 @@ def edgeCorners(corners):
 
 	fullCorners = np.array([newCorners])
 
+	# fullCorners should be an nparray of shape (64, 1, 2)
 	return fullCorners
 
 
@@ -143,6 +146,7 @@ while(True):
 	if found is True:
 		fullCorners = edgeCorners(corners)
 		# print corners.shape, corners.ndim, fullCorners, fullCorners.shape, fullCorners.ndim
+		# Change shape from (1, 81, 2) to (81, 1, 2)
 		fullCorners.shape = (81, 1, 2)
 		print fullCorners, fullCorners.shape, fullCorners.ndim
 		cv2.drawChessboardCorners(frame, full_pattern_size, fullCorners, found)
@@ -150,6 +154,7 @@ while(True):
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
 	cv2.imshow('frame', frame)
+	# q to quit
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break
 
