@@ -28,8 +28,8 @@ def getEdgeCornersRows(corners):
 
 	# print changeInX, changeInY, (changeInY/changeInX)
 
-	avgX = changeInX/length
-	avgY = changeInY/length
+	avgX = changeInX/last
+	avgY = changeInY/last
 
 	lowX = checkBounds("x", corners[0][0][0] - avgX)
 	lowY = checkBounds("y", corners[0][0][1] - avgY)
@@ -46,8 +46,8 @@ def getEdgeCornersCols(corners):
 	changeInX = corners[last][0] - corners[0][0]
 	changeInY = corners[last][1] - corners[0][1]
 
-	avgX = changeInX/length
-	avgY = changeInY/length
+	avgX = changeInX/last
+	avgY = changeInY/last
 
 	lowX = checkBounds("x", corners[0][0] - avgX)
 	lowY = checkBounds("y", corners[0][1] - avgY)
