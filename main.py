@@ -122,6 +122,14 @@ def edgeCorners(corners):
 	return fullCorners
 
 
+# KALYAN/SATHVIK FIND COLOR OF THE SQUARE
+def getSquareColor(points):
+	return []
+
+
+# SHICHENG GET PIXELS
+
+
 cap = cv2.VideoCapture(0)
 print cap.get(3), cap.get(4)
 
@@ -157,7 +165,7 @@ while(True):
 			print fullCorners[0][i]
 			x = int(fullCorners[0][i][0])
 			y = int(fullCorners[0][i][1])
-			cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
+			cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
