@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 
+
 def checkBounds(axis, val):
 	if val < 0:
 			return 0
@@ -11,7 +12,6 @@ def checkBounds(axis, val):
 		if val > cap.get(4):
 			return cap.get(4)
 	return val
-
 
 # Return the left/right or top/bottom edges of a given row/col
 def getEdgeCornersRows(corners):
@@ -122,7 +122,6 @@ def edgeCorners(corners):
 	return fullCorners
 
 
-
 cap = cv2.VideoCapture(0)
 print cap.get(3), cap.get(4)
 
@@ -140,7 +139,6 @@ while(True):
 	# When finding corners, performance takes a major hit -> fps drops
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
 	print found, corners
-
 
 	if found is True:
 		fullCorners = edgeCorners(corners)
@@ -160,7 +158,6 @@ while(True):
 			x = int(fullCorners[0][i][0])
 			y = int(fullCorners[0][i][1])
 			cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
-
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
