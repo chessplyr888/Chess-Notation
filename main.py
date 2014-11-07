@@ -124,10 +124,17 @@ def edgeCorners(corners):
 
 # KALYAN/SATHVIK FIND COLOR OF THE SQUARE
 def getSquareColor(points):
-	return []
+	white=0
+	black=0
+	for i in points:
+		if i[0]==0: black+=1
+		else: white+=1
+
+	return white>black
 
 
 # SHICHENG GET PIXELS
+# GET BINARY MASK
 
 
 cap = cv2.VideoCapture(0)
