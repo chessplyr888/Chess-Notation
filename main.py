@@ -122,6 +122,18 @@ def edgeCorners(corners):
 	return fullCorners
 
 
+def getContourList(corners):
+	contours = []
+	for i in range(0, 8):
+		for j in range(0, 7):
+			topLeft = corners[0][(i)*9 + (j)]
+			topRight = corners[0][(i)*9 + (j + 1)]
+			botLeft = corners[0][(i + 1)*9 + (j)]
+			botRight = corners[0][(i + 1)*9 + (j + 1)]
+			contours.append(np.array(topLeft, topRight, botLeft, botRight, dtype = numpy.int32))
+
+	return contours
+
 # KALYAN/SATHVIK FIND COLOR OF THE SQUARE
 def getSquareColor(points):
 	white=0
@@ -168,11 +180,21 @@ while(True):
 		# 	x, y = i.ravel()
 		# 	cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
 
+		# Draws the corners
 		for i in range(0, len(fullCorners[0])):
 			print fullCorners[0][i]
 			x = int(fullCorners[0][i][0])
 			y = int(fullCorners[0][i][1])
-			cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
+			cv2.circle(frame, (x, y), 5, (0, 255, 0), -1) # Green Points
+
+		# Get the contours
+		contours = getContourList(fullCorners)
+
+		# Draw the contours
+		cv2.drawContours(frame, contours, -1, (0, 0, 255), 3) # Blue Contours
+
+		# Get the average color of the square
+		
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
