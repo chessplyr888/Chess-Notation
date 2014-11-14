@@ -130,7 +130,7 @@ def getContourList(corners):
 			topRight = corners[0][(i)*9 + (j + 1)]
 			botLeft = corners[0][(i + 1)*9 + (j)]
 			botRight = corners[0][(i + 1)*9 + (j + 1)]
-			contours.append(np.array(topLeft, topRight, botLeft, botRight, dtype = numpy.int32))
+			contours.append(np.array(topLeft, topRight, botLeft, botRight, dtype = np.int32))
 
 	return contours
 
