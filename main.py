@@ -124,10 +124,21 @@ def edgeCorners(corners):
 
 # KALYAN/SATHVIK FIND COLOR OF THE SQUARE
 def getSquareColor(points):
-	return []
-
+	avgRed=0
+	avgGreen=0
+	avgBlue=0
+	count=0
+	for i in points:
+		count+=1
+		avgRed+=i[0]
+		avgGreen+=i[1]
+		avgBlue+=i[2]
+	return avgRed/count, avgGreen/count, avgBlue/count
 
 # SHICHENG GET PIXELS
+
+
+
 
 
 cap = cv2.VideoCapture(0)
