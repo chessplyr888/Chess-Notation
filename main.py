@@ -59,7 +59,7 @@ def edgeCorners(corners):
 	# Corners should be an nparray of shape (49, 1, 2)
 	newCorners = []
 
-	print "ROWS"
+	# print "ROWS"
 
 	# print corners.shape, corners.ndim
 
@@ -88,7 +88,7 @@ def edgeCorners(corners):
 
 	# Extrapolate cols col0 - col8
 
-	print "COLS"
+	# print "COLS"
 
 	cols = []
 	for i in range(0, 9):
@@ -125,37 +125,35 @@ def edgeCorners(corners):
 def getContourList(corners):
 	contours = []
 	for i in range(0, 8):
-		for j in range(0, 7):
+		for j in range(0, 8):
 			topLeft = corners[0][(i)*9 + (j)]
 			topRight = corners[0][(i)*9 + (j + 1)]
 			botLeft = corners[0][(i + 1)*9 + (j)]
 			botRight = corners[0][(i + 1)*9 + (j + 1)]
-			contours.append(np.array(topLeft, topRight, botLeft, botRight, dtype = np.int32))
+			contours.append(np.array((topLeft, topRight, botRight, botLeft), dtype = np.int32))
 
 	return contours
 
 # KALYAN/SATHVIK FIND COLOR OF THE SQUARE
-def getSquareColor(points):
+def getSquareColor(frame, points):
 	avgRed=0
 	avgGreen=0
 	avgBlue=0
 	count=0
 	for i in points:
+		print i
 		count+=1
-		avgRed+=i[0]
-		avgGreen+=i[1]
-		avgBlue+=i[2]
+		avgRed+=frame[i][0]
+		avgGreen+=frame[i][1]
+		avgBlue+=frame[i][2]
 	return avgRed/count, avgGreen/count, avgBlue/count
 
 
-# SHICHENG GET PIXELS
-# GET BINARY MASK
-
-
-
-
-
 cap = cv2.VideoCapture(0)
+# MAXIMUM RESOLUTION FOR LOGITECH C920 FOR STRESS TESTING
+# 921600 Pixels -> 3 X as many calculations as 640*480
+cap.set(3, 1280)
+cap.set(4, 720)
 print cap.get(3), cap.get(4)
 
 pattern_size = (7,7) # Inner corners of a chessboard
@@ -171,7 +169,7 @@ while(True):
 	# findChessboardCorners + drawChessboardCorners
 	# When finding corners, performance takes a major hit -> fps drops
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
-	print found, corners
+	print found
 
 	if found is True:
 		fullCorners = edgeCorners(corners)
@@ -188,7 +186,7 @@ while(True):
 
 		# Draws the corners
 		for i in range(0, len(fullCorners[0])):
-			print fullCorners[0][i]
+			# print fullCorners
 			x = int(fullCorners[0][i][0])
 			y = int(fullCorners[0][i][1])
 			cv2.circle(frame, (x, y), 5, (0, 255, 0), -1) # Green Points
@@ -196,15 +194,31 @@ while(True):
 		# Get the contours
 		contours = getContourList(fullCorners)
 
+		print contours
+
 		# Draw the contours
-		cv2.drawContours(frame, contours, -1, (0, 0, 255), 3) # Blue Contours
+		cv2.drawContours(frame, contours, 0, (0, 0, 255), 2) # Red Contours
 
 		# Get the average color of the square
+		colorOfSquare = []
+
+		# IMPORTANT - DRAW BOUNDING BOX FOR CONTOURS AND APPLY POINTPOLYGONTEST
+		# Should lead to massive performance increases
+
+		# pointsInContour = []
+		# for x in range(0, int(cap.get(3))):
+		# 	for y in range(0, int(cap.get(4))):
+		# 		if(cv2.pointPolygonTest(contours[0], (x, y), False) == 1):
+		# 			pointsInContour.append((x, y))
+
+		# print getSquareColor(frame, pointsInContour)
 		
 
+
 	# Display the resulting frame
-	cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
+	cv2.namedWindow("frame", cv2.WINDOW_AUTOSIZE)
 	cv2.imshow('frame', frame)
+
 	# q to quit
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break
