@@ -197,7 +197,7 @@ while(True):
 		print contours
 
 		# Draw the contours
-		cv2.drawContours(frame, contours, 0, (0, 0, 255), 2) # Red Contours
+		cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
 
 		# Get the average color of the square
 		colorOfSquare = []
