@@ -1,6 +1,5 @@
-# IN CASE OF PROGRESS REPORT ON FRIDAY NOVEMBER 21 2014
-# SATHVIK ALL YOU NED TO DO IS SAY THAT ALL THE CONTOURS AND BOUNDARIES FOR EACH SQUARE IS DRAWNN
-# AND THAT I AM WORKIN ON OPTIMIZING THE METHOD FOR CALCULATING THE PIXELS INSIDE THE CONTOUR
+# KALYAN/SATHVIK WORK ON getSquareColor (line 143) and getPrimaryColors (Line 159)
+# More will be explained in email
 
 
 import numpy as np
@@ -140,6 +139,7 @@ def getContourList(corners):
 	return contours
 
 # KALYAN/SATHVIK FIND COLOR OF THE SQUARE
+# Change this back to finding black/white from binary image
 def getSquareColor(frame, points):
 	avgRed=0
 	avgGreen=0
@@ -152,6 +152,13 @@ def getSquareColor(frame, points):
 		avgGreen+=frame[i][1]
 		avgBlue+=frame[i][2]
 	return avgRed/count, avgGreen/count, avgBlue/count
+
+
+# KALYAN/SATHVIK START RESEARCHING KMEANS
+# This method finds the important colors of the square (aka what colors are present - useful in determing what color peice is there)
+def getPrimaryColors(frame, points):
+
+
 
 
 cap = cv2.VideoCapture(0)
@@ -209,6 +216,17 @@ while(True):
 
 		# IMPORTANT - DRAW BOUNDING BOX FOR CONTOURS AND APPLY POINTPOLYGONTEST
 		# Should lead to massive performance increases
+
+		# Test Case For A Single Countour (Square)
+		pointsInContour = []
+
+		x, y, w, h = cv2.boundingRect(contours[0])
+		squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
+
+		for tempX in range(x, x + w):
+			for tempY in range(y, y + h):
+				if(cv2.pointPolygonTest(contours[0], (tempX, tempY), false) == 1):
+					pointsInContour.append(tempX, tempY)
 
 		# pointsInContour = []
 		# for x in range(0, int(cap.get(3))):
