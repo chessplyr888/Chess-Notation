@@ -157,7 +157,7 @@ def getSquareColor(frame, points):
 # KALYAN/SATHVIK START RESEARCHING KMEANS
 # This method finds the important colors of the square (aka what colors are present - useful in determing what color peice is there)
 def getPrimaryColors(frame, points):
-
+        return frame
 
 
 
