@@ -176,7 +176,13 @@ def getSquareColor(frame, points):
 def getPrimaryColors(frame, points):
         return frame
 
-
+# INSTANTIATE VARIABLES HERE (TODO LATER) 
+# 
+# 
+# 
+# 
+# 
+# 
 # cap = cv2.VideoCapture(0) # Primary (Built in) Camera
 cap = cv2.VideoCapture(1) # Secondary (Attached) Camera
 # MAXIMUM RESOLUTION FOR LOGITECH C920 FOR STRESS TESTING
@@ -187,6 +193,13 @@ print cap.get(3), cap.get(4)
 
 pattern_size = (7,7) # Inner corners of a chessboard
 full_pattern_size = (9,9) # All corners of a chessboard
+# 
+# 
+# 
+# 
+# 
+# 
+# 
 
 while(True):
 	# Capture frame-by-frame
@@ -247,13 +260,27 @@ while(True):
 		print "Load Image Time: %f" %(getImageTimeEnd - getImageTimeStart)
 
 		getPointsTimeStart = time.time()
-		for tempX in range(x, x + w):
-			for tempY in range(y, y + h):
-				if(cv2.pointPolygonTest(contours[0], (tempX, tempY), False) == 1):
-					pointsInContour.append((tempX, tempY))
+		for i in range(x, x + w):
+			for j in range(y, y + h):
+				if(cv2.pointPolygonTest(contours[0], (i, j), False) == 1):
+					pointsInContour.append((i, j))
 		getPointsTimeEnd = time.time()
 
 		print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
+
+		# Get binary color mask of bounding box
+		mask = frame[y: y + h, x: x + w]
+		grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+		binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
+		# Get binary mask of square region
+		ROI = [] # ROI is Region of Interest
+		for i in range(x, x + w):
+			for j in range(y, y + h):
+				ROI.append(binaryMask[i, j])
+
+		# Get color of ROI
+
 
 		# print(pointsInContour)
 
