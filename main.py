@@ -4,6 +4,7 @@
 
 import numpy as np
 import cv2
+import time
 
 
 def checkBounds(axis, val):
@@ -138,6 +139,22 @@ def getContourList(corners):
 
 	return contours
 
+def boundingBox(points):
+	x = []
+	for i in range(0,4):
+		x.append(points[i][0])
+
+	y = [] 
+	for i in range(0,4):
+		y.append(points[i][1])
+
+	xmin = min(x)
+	xmax = max(x)
+	ymin = min(y)
+	ymax = max(y)
+
+	return (xmin, ymin, xmax - xmin, ymax - ymin)
+
 # KALYAN/SATHVIK FIND COLOR OF THE SQUARE
 # Change this back to finding black/white from binary image
 def getSquareColor(frame, points):
@@ -160,8 +177,8 @@ def getPrimaryColors(frame, points):
         return frame
 
 
-
-cap = cv2.VideoCapture(0)
+# cap = cv2.VideoCapture(0) # Primary (Built in) Camera
+cap = cv2.VideoCapture(1) # Secondary (Attached) Camera
 # MAXIMUM RESOLUTION FOR LOGITECH C920 FOR STRESS TESTING
 # 921600 Pixels -> 3 X as many calculations as 640*480
 cap.set(3, 1280)
@@ -206,10 +223,12 @@ while(True):
 		# Get the contours
 		contours = getContourList(fullCorners)
 
-		print contours
+		# print contours
 
 		# Draw the contours
 		cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
+
+		# print contours[0]
 
 		# Get the average color of the square
 		colorOfSquare = []
@@ -220,23 +239,23 @@ while(True):
 		# Test Case For A Single Countour (Square)
 		pointsInContour = []
 
-		x, y, w, h = cv2.boundingRect(contours[0])
+		getImageTimeStart = time.time()
+		x, y, w, h = boundingBox(contours[0])
 		squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
+		getImageTimeEnd = time.time()
 
+		print "Load Image Time: %f" %(getImageTimeEnd - getImageTimeStart)
+
+		getPointsTimeStart = time.time()
 		for tempX in range(x, x + w):
 			for tempY in range(y, y + h):
-				if(cv2.pointPolygonTest(contours[0], (tempX, tempY), false) == 1):
-					pointsInContour.append(tempX, tempY)
+				if(cv2.pointPolygonTest(contours[0], (tempX, tempY), False) == 1):
+					pointsInContour.append((tempX, tempY))
+		getPointsTimeEnd = time.time()
 
-		# pointsInContour = []
-		# for x in range(0, int(cap.get(3))):
-		# 	for y in range(0, int(cap.get(4))):
-		# 		if(cv2.pointPolygonTest(contours[0], (x, y), False) == 1):
-		# 			pointsInContour.append((x, y))
+		print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
 
-		# print getSquareColor(frame, pointsInContour)
-		
-
+		# print(pointsInContour)
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_AUTOSIZE)
