@@ -157,18 +157,15 @@ def boundingBox(points):
 
 # KALYAN/SATHVIK FIND COLOR OF THE SQUARE
 # Change this back to finding black/white from binary image
-def getSquareColor(frame, points):
-	avgRed=0
-	avgGreen=0
-	avgBlue=0
-	count=0
-	for i in points:
-		print i
-		count+=1
-		avgRed+=frame[i][0]
-		avgGreen+=frame[i][1]
-		avgBlue+=frame[i][2]
-	return avgRed/count, avgGreen/count, avgBlue/count
+def getSquareColor(binaryROI):
+	black = 0
+	white = 0
+	for i in range(0, len(binaryROI)):
+		if binaryROI[i] == 0:
+			black += 1
+		else:
+			white += 1
+	return white > black
 
 
 # KALYAN/SATHVIK START RESEARCHING KMEANS
@@ -253,7 +250,7 @@ while(True):
 		pointsInContour = []
 
 		getImageTimeStart = time.time()
-		x, y, w, h = boundingBox(contours[0])
+		x, y, w, h = boundingBox(contours[1])
 		squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
 		getImageTimeEnd = time.time()
 
@@ -262,25 +259,33 @@ while(True):
 		getPointsTimeStart = time.time()
 		for i in range(x, x + w):
 			for j in range(y, y + h):
-				if(cv2.pointPolygonTest(contours[0], (i, j), False) == 1):
+				if(cv2.pointPolygonTest(contours[1], (i, j), False) == 1):
 					pointsInContour.append((i, j))
 		getPointsTimeEnd = time.time()
 
 		print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
 
 		# Get binary color mask of bounding box
-		mask = frame[y: y + h, x: x + w]
+		# mask = frame[y: y + h, x: x + w]
+		mask = frame[x: x + w, y: y + h]
 		grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-		binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+		# binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+		(thresh, binaryMask) = cv2.threshold(grayMask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
 		# Get binary mask of square region
 		ROI = [] # ROI is Region of Interest
-		for i in range(x, x + w):
-			for j in range(y, y + h):
+		for i in range(0, w):
+			for j in range(0, h):
 				ROI.append(binaryMask[i, j])
 
-		# Get color of ROI
+		# print ROI
 
+		# Get color of ROI
+		squareColor = getSquareColor(ROI)
+		if squareColor == True:
+			print "white"
+		else:
+			print "black"
 
 		# print(pointsInContour)
 
