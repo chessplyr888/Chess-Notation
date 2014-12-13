@@ -1,6 +1,3 @@
-# KALYAN/SATHVIK WORK ON getSquareColor (line 143) and getPrimaryColors (Line 159)
-# More will be explained in email
-
 
 import numpy as np
 import cv2
@@ -64,19 +61,10 @@ def edgeCorners(corners):
 	# Corners should be an nparray of shape (49, 1, 2)
 	newCorners = []
 
-	# print "ROWS"
-
-	# print corners.shape, corners.ndim
-
-	# Extrapolate rows row0 - row6
 	rows = []
 	for i in range(0,7):
 		rows.append((corners[0 + 7*i:7 + 7*i]))
 		# print corners[0 + 7*i:7 + 7*i]
-
-	# print rows[0].shape, rows[0].ndim
-
-	# print rows
 
 	newRows = []
 
@@ -88,12 +76,6 @@ def edgeCorners(corners):
 			# print rows[i][j][0]
 			newRows.append([rows[i][j][0][0], rows[i][j][0][1]])
 		newRows.append(temp[1])
-
-	# print newRows, len(newRows)
-
-	# Extrapolate cols col0 - col8
-
-	# print "COLS"
 
 	cols = []
 	for i in range(0, 9):
@@ -112,14 +94,9 @@ def edgeCorners(corners):
 		# print "after", cols[i], len(cols[i])
 
 	# Convert newCorners to numpy array
-	
-	# print len(cols), len(cols[0])
-
 	for i in range(0, len(cols)):
 		for j in range(0, len(cols[i])):
 			newCorners.append(cols[i][j])
-
-	# print newCorners, len(newCorners)
 
 	fullCorners = np.array([newCorners])
 
@@ -212,16 +189,6 @@ while(True):
 
 	if found is True:
 		fullCorners = edgeCorners(corners)
-		# print corners.shape, corners.ndim, fullCorners, fullCorners.shape, fullCorners.ndim
-		# Change shape from (1, 81, 2) to (81, 1, 2)
-		# fullCorners.shape = (81, 1, 2)
-		# print fullCorners, fullCorners.shape, fullCorners.ndim
-		# cv2.drawChessboardCorners(frame, full_pattern_size, fullCorners, found)
-
-		# Attempt without drawChessboardCorners, manually drawing the corners
-		# for i in fullCorners:
-		# 	x, y = i.ravel()
-		# 	cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
 
 		# Draws the corners
 		for i in range(0, len(fullCorners[0])):
@@ -233,18 +200,11 @@ while(True):
 		# Get the contours
 		contours = getContourList(fullCorners)
 
-		# print contours
-
 		# Draw the contours
 		cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
 
-		# print contours[0]
-
 		# Get the average color of the square
 		colorOfSquare = []
-
-		# IMPORTANT - DRAW BOUNDING BOX FOR CONTOURS AND APPLY POINTPOLYGONTEST
-		# Should lead to massive performance increases
 
 		# Test Case For A Single Countour (Square)
 		pointsInContour = []
@@ -266,11 +226,10 @@ while(True):
 		print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
 
 		# Get binary color mask of bounding box
-		# mask = frame[y: y + h, x: x + w]
 		mask = frame[x: x + w, y: y + h]
 		grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
 		# binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-		(thresh, binaryMask) = cv2.threshold(grayMask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+		thresh, binaryMask = cv2.threshold(grayMask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
 		# Get binary mask of square region
 		ROI = [] # ROI is Region of Interest
@@ -278,16 +237,12 @@ while(True):
 			for j in range(0, h):
 				ROI.append(binaryMask[i, j])
 
-		# print ROI
-
 		# Get color of ROI
 		squareColor = getSquareColor(ROI)
 		if squareColor == True:
 			print "white"
 		else:
 			print "black"
-
-		# print(pointsInContour)
 
 	# Display the resulting frame
 	cv2.namedWindow("frame", cv2.WINDOW_AUTOSIZE)
