@@ -210,7 +210,7 @@ while(True):
 		pointsInContour = []
 
 		getImageTimeStart = time.time()
-		x, y, w, h = boundingBox(contours[1])
+		x, y, w, h = boundingBox(contours[0])
 		squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
 		getImageTimeEnd = time.time()
 
@@ -219,7 +219,7 @@ while(True):
 		getPointsTimeStart = time.time()
 		for i in range(x, x + w):
 			for j in range(y, y + h):
-				if(cv2.pointPolygonTest(contours[1], (i, j), False) == 1):
+				if(cv2.pointPolygonTest(contours[0], (i, j), False) == 1):
 					pointsInContour.append((i, j))
 		getPointsTimeEnd = time.time()
 
