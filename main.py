@@ -229,7 +229,7 @@ while(True):
 		mask = frame[x: x + w, y: y + h]
 		grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
 		# binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-		thresh, binaryMask = cv2.threshold(grayMask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+		ret, binaryMask = cv2.threshold(grayMask, 127, 255, cv2.THRESH_BINARY)
 
 		# Get binary mask of square region
 		ROI = [] # ROI is Region of Interest
