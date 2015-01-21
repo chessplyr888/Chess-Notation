@@ -2,6 +2,8 @@
 import numpy as np
 import cv2
 import time
+from random import randint,choice
+from deepcopy import deepcopy
 
 
 def checkBounds(axis, val):
@@ -147,8 +149,59 @@ def getSquareColor(binaryROI):
 
 # KALYAN/SATHVIK START RESEARCHING KMEANS
 # This method finds the important colors of the square (aka what colors are present - useful in determing what color peice is there)
-def getPrimaryColors(frame, points):
-        return frame
+def getPrimaryColors(ROI, k):
+	colors=[]# will have length k
+	
+	# list of centers with all points in a cluster,
+	# index 0 is the centroid of cluster (can be intialized as random triple or chosen from ROI
+	# index 1+ are points in the cluster
+	#centers=[ [( randint(0,255), randint(0,255), randint(0,255) )] for i in range(k)]
+	centers=[ [ choice(ROI) ] for i in range(k)]
+	#
+	hasChanged=True
+	while(hasChanged):
+		#reset centers list
+		for i in range(k):
+			centers[i]=[centers[i][0]]
+		#
+		for p in ROI: #assign points to cluster
+			mindist=1000000000
+			minindex=-1
+			for c in range(len(centers)):#c - which cluster
+				dist=sum([ (p[i]-centers[c][0][i])**2 for i in range(3)])
+				if(dist<mindist):
+					mindist=dist
+					minindex=c
+			#
+			centers[minindex].append(p)
+		#
+		hasChanged=False
+		for c in centers:#modify center of clusters
+			oldCenter=c[0]
+			allPoints=c[1:]
+			L=len(allPoints)
+			if(L<=0): continue
+			#
+			colorTotals=[0,0,0]
+			for p in allPoints:
+				colorTotals[0]+=p[0]
+				colorTotals[1]+=p[1]
+				colorTotals[2]+=p[2]
+			colorTotals[0]//=L
+			colorTotals[1]//=L
+			colorTotals[2]//=L
+			
+			if(colorTotals[0] != oldCenter[0] or colorTotals[1] != oldCenter[1] or colorTotals[1] != oldCenter[1]): #if no change in centers, end
+				hasChanged=True
+				
+			c[0]=tuple(colorTotals)
+		
+		
+	
+	##
+	colors=[ centers[c][0] for c in range(k) ]
+	return colors
+
 
 # INSTANTIATE VARIABLES HERE (TODO LATER) 
 # 
