@@ -156,7 +156,8 @@ def getPrimaryColors(ROI, k):
 	# index 0 is the centroid of cluster (can be intialized as random triple or chosen from ROI
 	# index 1+ are points in the cluster
 	#centers=[ [( randint(0,255), randint(0,255), randint(0,255) )] for i in range(k)]
-	centers=[ [ choice(ROI) ] for i in range(k)]
+	centers=[ [( 255*(i+1)//(k+1), 255*(i+1)//(k+1), 255*(i+1)//(k+1) )] for i in range(k)]
+	#centers=[ [ choice(ROI) ] for i in range(k)]
 	#
 	hasChanged=True
 	while(hasChanged):
@@ -191,7 +192,7 @@ def getPrimaryColors(ROI, k):
 			colorTotals[1]//=L
 			colorTotals[2]//=L
 			
-			if(colorTotals[0] != oldCenter[0] or colorTotals[1] != oldCenter[1] or colorTotals[1] != oldCenter[1]): #if no change in centers, end
+			if(colorTotals[0] != oldCenter[0] or colorTotals[1] != oldCenter[1] or colorTotals[2] != oldCenter[2]): #if no change in centers, end
 				hasChanged=True
 				
 			c[0]=tuple(colorTotals)
