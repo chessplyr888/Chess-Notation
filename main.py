@@ -271,6 +271,9 @@ while(True):
 		# Get the average color of the square
 		colorOfSquare = []
 
+		# Pixels of the entire board
+		fullBoardROI = []
+
 		# Test Case For A Single Countour (Square)
 		pointsInContour = []
 
@@ -281,16 +284,18 @@ while(True):
 
 		print "Load Image Time: %f" %(getImageTimeEnd - getImageTimeStart)
 
+		# Gets all the points in every contour and adds them to the custom full board ROI
 		getPointsTimeStart = time.time()
-		for i in range(x, x + w):
-			for j in range(y, y + h):
-				if(cv2.pointPolygonTest(contours[0], (i, j), False) == 1):
-					pointsInContour.append((i, j))
+		for k in range(0, 64):
+			for i in range(x, x + w):
+				for j in range(y, y + h):
+					if(cv2.pointPolygonTest(contours[k], (i, j), False) == 1):
+						fullBoardROI.append((i, j))
 		getPointsTimeEnd = time.time()
 
 		print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
 
-		# Get binary color mask of bounding box
+		# Get binary color mask of fullBoardROI -> TODO
 		mask = frame[x: x + w, y: y + h]
 		grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
 		# binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
@@ -302,6 +307,7 @@ while(True):
 			for j in range(0, h):
 				ROI.append(binaryMask[i, j])
 
+		# WILL BECOME OBSOLETE
 		# Get color of ROI
 		squareColor = getSquareColor(ROI)
 		if squareColor == True:
