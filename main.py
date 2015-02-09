@@ -201,7 +201,18 @@ def getPrimaryColors(ROI, k):
 	
 	##
 	colors=[ centers[c][0] for c in range(k) ]
-	return colors
+	
+	newRoi=deepcopy(ROI)
+	for p in range(len(ROI)):
+		mindist=1000000000
+		for c in colors:
+			dist=sum([ (ROI[p][i]-c[i])**2 for i in range(3) ])
+			if(dist<mindist):
+				mindist=dist
+				newRoi[p]=c
+		
+		
+	return colors, newRoi
 
 
 # INSTANTIATE VARIABLES HERE (TODO LATER) 
