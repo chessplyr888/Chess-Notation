@@ -277,12 +277,17 @@ while(True):
 		# Test Case For A Single Countour (Square)
 		pointsInContour = []
 
-		getImageTimeStart = time.time()
-		x, y, w, h = boundingBox(contours[0])
-		squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
-		getImageTimeEnd = time.time()
+		# List of all bounding boxes
+		boxes = []
 
-		print "Load Image Time: %f" %(getImageTimeEnd - getImageTimeStart)
+		getBoxTimeStart = time.time()
+		for i in range(0, 64):
+			x, y, w, h = boundingBox(contours[i])
+			boxes.append([x, y, w, h])
+			squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
+		getBoxTimeEnd = time.time()
+
+		print "Load Image Time: %f" %(getBoxTimeEnd - getBoxTimeStart)
 
 		# Gets all the points in every contour and adds them to the custom full board ROI
 		getPointsTimeStart = time.time()
