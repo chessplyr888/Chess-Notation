@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import time
 from random import randint,choice
-from deepcopy import deepcopy
+from copy import deepcopy
 
 
 def checkBounds(axis, val):
@@ -146,28 +146,55 @@ def getSquareColor(binaryROI):
 			white += 1
 	return white > black
 
+def grayScale(ROI, base):
+	red = 0;
+	green = 0; 
+	blue = 0;
+	for i in ROI:
+		red = base[ROI[i][0]][ROI[i][1]][0]
+		green = base[ROI[i][0]][ROI[i][1]][1]
+		blue = base[ROI[i][0]][ROI[i][1]][2]
+
+		gray = (int)(0.2126*red + 0.7152*green + 0.0722*blue)
+
+		base[ROI[i][0]][ROI[i][1]][0] = gray
+		base[ROI[i][0]][ROI[i][1]][1] = gray
+		base[ROI[i][0]][ROI[i][1]][2] = gray
+
+	return base
 
 # KALYAN/SATHVIK START RESEARCHING KMEANS
 # This method finds the important colors of the square (aka what colors are present - useful in determing what color peice is there)
-def getPrimaryColors(ROI, k):
+def getPrimaryColors(frame, ROI, k):
 	colors=[]# will have length k
 	
 	# list of centers with all points in a cluster,
 	# index 0 is the centroid of cluster (can be intialized as random triple or chosen from ROI
 	# index 1+ are points in the cluster
 	#centers=[ [( randint(0,255), randint(0,255), randint(0,255) )] for i in range(k)]
-	centers=[ [( 255*(i+1)//(k+1), 255*(i+1)//(k+1), 255*(i+1)//(k+1) )] for i in range(k)]
+	centers=[ [( 255*(i+1)/(k+1), 255*(i+1)/(k+1), 255*(i+1)/(k+1) )] for i in range(k)]
 	#centers=[ [ choice(ROI) ] for i in range(k)]
 	#
+	# print len(frame), frame.shape, ROI[0], ROI[1]
+	tempROI = []
+	for i in ROI:
+		# print i
+		x = frame[i[0], i[1]][0]
+		y = frame[i[0], i[1]][1]
+		z = frame[i[0], i[1]][2]
+		tempROI.append([x, y, z])
+
 	hasChanged=True
 	while(hasChanged):
 		#reset centers list
 		for i in range(k):
 			centers[i]=[centers[i][0]]
 		#
-		for p in ROI: #assign points to cluster
+		for p in tempROI: #assign points to cluster
 			mindist=1000000000
 			minindex=-1
+
+			# print len(p), len(centers)
 			for c in range(len(centers)):#c - which cluster
 				dist=sum([ (p[i]-centers[c][0][i])**2 for i in range(3)])
 				if(dist<mindist):
@@ -188,25 +215,29 @@ def getPrimaryColors(ROI, k):
 				colorTotals[0]+=p[0]
 				colorTotals[1]+=p[1]
 				colorTotals[2]+=p[2]
-			colorTotals[0]//=L
-			colorTotals[1]//=L
-			colorTotals[2]//=L
+			colorTotals[0]/=L
+			colorTotals[1]/=L
+			colorTotals[2]/=L
+
+			# print oldCenter, colorTotals
 			
-			if(colorTotals[0] != oldCenter[0] or colorTotals[1] != oldCenter[1] or colorTotals[2] != oldCenter[2]): #if no change in centers, end
+			if((colorTotals[0] != oldCenter[0]) or (colorTotals[1] != oldCenter[1]) or (colorTotals[2] != oldCenter[2])): #if no change in centers, end
 				hasChanged=True
 				
 			c[0]=tuple(colorTotals)
-		
+		# print hasChanged
 		
 	
 	##
 	colors=[ centers[c][0] for c in range(k) ]
+
+	# print colors
 	
-	newRoi=deepcopy(ROI)
-	for p in range(len(ROI)):
+	newRoi=deepcopy(tempROI)
+	for p in range(len(tempROI)):
 		mindist=1000000000
 		for c in colors:
-			dist=sum([ (ROI[p][i]-c[i])**2 for i in range(3) ])
+			dist=sum([ (tempROI[p][i]-c[i])**2 for i in range(3) ])
 			if(dist<mindist):
 				mindist=dist
 				newRoi[p]=c
@@ -226,8 +257,8 @@ def getPrimaryColors(ROI, k):
 cap = cv2.VideoCapture(1) # Secondary (Attached) Camera
 # MAXIMUM RESOLUTION FOR LOGITECH C920 FOR STRESS TESTING
 # 921600 Pixels -> 3 X as many calculations as 640*480
-cap.set(3, 1280)
-cap.set(4, 720)
+cap.set(3, 640)
+cap.set(4, 480)
 print cap.get(3), cap.get(4)
 
 pattern_size = (7,7) # Inner corners of a chessboard
@@ -243,6 +274,8 @@ full_pattern_size = (9,9) # All corners of a chessboard
 while(True):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
+
+	print frame.shape
 
 	# Our operations on the frame come here
 	base = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -260,13 +293,13 @@ while(True):
 			# print fullCorners
 			x = int(fullCorners[0][i][0])
 			y = int(fullCorners[0][i][1])
-			cv2.circle(frame, (x, y), 5, (0, 255, 0), -1) # Green Points
+			# cv2.circle(frame, (x, y), 5, (0, 255, 0), -1) # Green Points
 
 		# Get the contours
 		contours = getContourList(fullCorners)
 
 		# Draw the contours
-		cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
+		# cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
 
 		# Get the average color of the square
 		colorOfSquare = []
@@ -284,7 +317,7 @@ while(True):
 		for i in range(0, 64):
 			x, y, w, h = boundingBox(contours[i])
 			boxes.append([x, y, w, h])
-			squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
+			# squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
 		getBoxTimeEnd = time.time()
 
 		print "Load Image Time: %f" %(getBoxTimeEnd - getBoxTimeStart)
@@ -300,29 +333,38 @@ while(True):
 
 		print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
 
+		# print fullBoardROI
+
+		# K-Means N Color Image
+		primeColors, newROI = getPrimaryColors(frame, fullBoardROI, 2)
+
+		print primeColors
+
 		# Get binary color mask of fullBoardROI -> TODO
-		mask = frame[x: x + w, y: y + h]
-		grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+		# mask = frame[x: x + w, y: y + h]
+		# grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
 		# binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-		ret, binaryMask = cv2.threshold(grayMask, 127, 255, cv2.THRESH_BINARY)
+		# ret, binaryMask = cv2.threshold(grayMask, 127, 255, cv2.THRESH_BINARY)
 
 		# Get binary mask of square region
-		ROI = [] # ROI is Region of Interest
-		for i in range(0, w):
-			for j in range(0, h):
-				ROI.append(binaryMask[i, j])
+		# ROI = [] # ROI is Region of Interest
+		# for i in range(0, w):
+		# 	for j in range(0, h):
+		# 		ROI.append(binaryMask[i, j])
+
+		# print ROI
 
 		# WILL BECOME OBSOLETE
 		# Get color of ROI
-		squareColor = getSquareColor(ROI)
-		if squareColor == True:
-			print "white"
-		else:
-			print "black"
+		# squareColor = getSquareColor(ROI)
+		# if squareColor == True:
+		# 	print "white"
+		# else:
+		# 	print "black"
 
 	# Display the resulting frame
-	cv2.namedWindow("frame", cv2.WINDOW_AUTOSIZE)
-	cv2.imshow('frame', frame)
+	cv2.namedWindow("newROI", cv2.WINDOW_AUTOSIZE)
+	cv2.imshow('newROI', frame)
 
 	# q to quit
 	if cv2.waitKey(1) & 0xFF == ord('q'):
