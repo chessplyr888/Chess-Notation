@@ -179,9 +179,9 @@ def getPrimaryColors(frame, ROI, k):
 	tempROI = []
 	for i in ROI:
 		# print i
-		x = frame[i[0], i[1]][0]
-		y = frame[i[0], i[1]][1]
-		z = frame[i[0], i[1]][2]
+		x = frame[i[1], i[0]][0]
+		y = frame[i[1], i[0]][1]
+		z = frame[i[1], i[0]][2]
 		tempROI.append([x, y, z])
 
 	hasChanged=True
@@ -253,8 +253,8 @@ def getPrimaryColors(frame, ROI, k):
 # 
 # 
 # 
-# cap = cv2.VideoCapture(0) # Primary (Built in) Camera
-cap = cv2.VideoCapture(1) # Secondary (Attached) Camera
+cap = cv2.VideoCapture(0) # Primary (Built in) Camera
+# cap = cv2.VideoCapture(1) # Secondary (Attached) Camera
 # MAXIMUM RESOLUTION FOR LOGITECH C920 FOR STRESS TESTING
 # 921600 Pixels -> 3 X as many calculations as 640*480
 cap.set(3, 640)
@@ -271,6 +271,8 @@ full_pattern_size = (9,9) # All corners of a chessboard
 # 
 # 
 
+fullCorners = []
+
 while(True):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
@@ -284,83 +286,99 @@ while(True):
 	# When finding corners, performance takes a major hit -> fps drops
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
 	print found
+	if found:
+		break
 
-	if found is True:
+while(True):
+		# Capture frame-by-frame
+	ret, frame = cap.read()
+
+	print frame.shape
+
+	# Our operations on the frame come here
+	base = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+	# findChessboardCorners + drawChessboardCorners
+	# When finding corners, performance takes a major hit -> fps drops
+	found, corners = cv2.findChessboardCorners(frame, pattern_size)
+	print found
+
+	if found:
 		fullCorners = edgeCorners(corners)
 
-		# Draws the corners
-		for i in range(0, len(fullCorners[0])):
-			# print fullCorners
-			x = int(fullCorners[0][i][0])
-			y = int(fullCorners[0][i][1])
-			# cv2.circle(frame, (x, y), 5, (0, 255, 0), -1) # Green Points
+	# Draws the corners
+	for i in range(0, len(fullCorners[0])):
+		# print fullCorners
+		x = int(fullCorners[0][i][0])
+		y = int(fullCorners[0][i][1])
+		cv2.circle(frame, (x, y), 5, (0, 255, 0), -1) # Green Points
 
-		# Get the contours
-		contours = getContourList(fullCorners)
+	# Get the contours
+	contours = getContourList(fullCorners)
 
-		# Draw the contours
-		# cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
+	# Draw the contours
+	cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
 
-		# Get the average color of the square
-		colorOfSquare = []
+	# Get the average color of the square
+	colorOfSquare = []
 
-		# Pixels of the entire board
-		fullBoardROI = []
+	# Pixels of the entire board
+	fullBoardROI = []
 
-		# Test Case For A Single Countour (Square)
-		pointsInContour = []
+	# Test Case For A Single Countour (Square)
+	pointsInContour = []
 
-		# List of all bounding boxes
-		boxes = []
+	# List of all bounding boxes
+	boxes = []
 
-		getBoxTimeStart = time.time()
-		for i in range(0, 64):
-			x, y, w, h = boundingBox(contours[i])
-			boxes.append([x, y, w, h])
-			# squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
-		getBoxTimeEnd = time.time()
+	getBoxTimeStart = time.time()
+	for i in range(0, 64):
+		x, y, w, h = boundingBox(contours[i])
+		boxes.append([x, y, w, h])
+		squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
+	getBoxTimeEnd = time.time()
 
-		print "Load Image Time: %f" %(getBoxTimeEnd - getBoxTimeStart)
+	print "Load Image Time: %f" %(getBoxTimeEnd - getBoxTimeStart)
 
-		# Gets all the points in every contour and adds them to the custom full board ROI
-		getPointsTimeStart = time.time()
-		for k in range(0, 64):
-			for i in range(x, x + w):
-				for j in range(y, y + h):
-					if(cv2.pointPolygonTest(contours[k], (i, j), False) == 1):
-						fullBoardROI.append((i, j))
-		getPointsTimeEnd = time.time()
+	# Gets all the points in every contour and adds them to the custom full board ROI
+	getPointsTimeStart = time.time()
+	for k in range(0, 64):
+		for i in range(x, x + w):
+			for j in range(y, y + h):
+				if(cv2.pointPolygonTest(contours[k], (i, j), False) == 1):
+					fullBoardROI.append((i, j))
+	getPointsTimeEnd = time.time()
 
-		print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
+	print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
 
-		# print fullBoardROI
+	# print fullBoardROI
 
-		# K-Means N Color Image
-		primeColors, newROI = getPrimaryColors(frame, fullBoardROI, 2)
+	# K-Means N Color Image
+	primeColors, newROI = getPrimaryColors(frame, fullBoardROI, 2)
 
-		print primeColors
+	print primeColors
 
-		# Get binary color mask of fullBoardROI -> TODO
-		# mask = frame[x: x + w, y: y + h]
-		# grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-		# binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-		# ret, binaryMask = cv2.threshold(grayMask, 127, 255, cv2.THRESH_BINARY)
+	# Get binary color mask of fullBoardROI -> TODO
+	# mask = frame[x: x + w, y: y + h]
+	# grayMask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+	# binaryMask = cv2.adaptiveThreshold(grayMask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+	# ret, binaryMask = cv2.threshold(grayMask, 127, 255, cv2.THRESH_BINARY)
 
-		# Get binary mask of square region
-		# ROI = [] # ROI is Region of Interest
-		# for i in range(0, w):
-		# 	for j in range(0, h):
-		# 		ROI.append(binaryMask[i, j])
+	# Get binary mask of square region
+	# ROI = [] # ROI is Region of Interest
+	# for i in range(0, w):
+	# 	for j in range(0, h):
+	# 		ROI.append(binaryMask[i, j])
 
-		# print ROI
+	# print ROI
 
-		# WILL BECOME OBSOLETE
-		# Get color of ROI
-		# squareColor = getSquareColor(ROI)
-		# if squareColor == True:
-		# 	print "white"
-		# else:
-		# 	print "black"
+	# WILL BECOME OBSOLETE
+	# Get color of ROI
+	# squareColor = getSquareColor(ROI)
+	# if squareColor == True:
+	# 	print "white"
+	# else:
+	# 	print "black"
 
 	# Display the resulting frame
 	cv2.namedWindow("newROI", cv2.WINDOW_AUTOSIZE)
