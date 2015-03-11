@@ -301,7 +301,7 @@ while(True):
 	# findChessboardCorners + drawChessboardCorners
 	# When finding corners, performance takes a major hit -> fps drops
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
-	print found
+	print foundl
 
 	if found:
 		fullCorners = edgeCorners(corners)
