@@ -91,7 +91,7 @@ def main():
 		
 
 	#roi=[ (randint(0,255),randint(0,255),randint(0,255)) for i in range(10)]
-	colors,newRoi=getPrimaryColors(image, 5)
+	colors,newRoi=getPrimaryColors(image, 4)
 	#print(newRoi, colors, sep="\n")
 	
 	outfile=open('kmeanschess.ppm','w')

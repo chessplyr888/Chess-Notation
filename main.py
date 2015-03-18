@@ -301,7 +301,7 @@ while(True):
 	# findChessboardCorners + drawChessboardCorners
 	# When finding corners, performance takes a major hit -> fps drops
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
-	print foundl
+	print found
 
 	if found:
 		fullCorners = edgeCorners(corners)
@@ -351,12 +351,24 @@ while(True):
 
 	print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
 
-	# print fullBoardROI
+
 
 	# K-Means N Color Image
-	primeColors, newROI = getPrimaryColors(frame, fullBoardROI, 2)
+	primeColors, newROI = getPrimaryColors(frame, fullBoardROI, 4)
 
 	print primeColors
+	
+	# print fullBoardROI
+	getPrintTimeStart = time.time()
+	p=0
+	for k in range(0, 64):
+		for i in range(x, x + w):
+			for j in range(y, y + h):
+				frame[i,j]=newROI[p]
+				p+=1
+	getPrintTimeEnd = time.time()
+
+	print "Calculate Print Full Board ROI Time: %f" %(getPrintTimeEnd - getPrintTimeStart)
 
 	# Get binary color mask of fullBoardROI -> TODO
 	# mask = frame[x: x + w, y: y + h]
