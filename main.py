@@ -245,6 +245,12 @@ def getPrimaryColors(frame, ROI, k):
 		
 	return colors, newRoi
 
+def getSubSquare(frame, ROI):
+	pass
+
+
+
+
 
 # INSTANTIATE VARIABLES HERE (TODO LATER) 
 # 
