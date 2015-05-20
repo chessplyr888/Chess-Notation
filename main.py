@@ -245,6 +245,64 @@ def getPrimaryColors(frame, ROI, k):
 		
 	return colors, newRoi
 
+
+def extrapolatePotentialCorners(pattern_size, corners):
+	# Pattern size ranges from (1,1) to (7,7)
+	diff = pattern_size[0] - full_pattern_size[0]
+	
+	length = len(corners)
+	last = length - 1
+
+	# print corners
+
+	dx = corners[last][0][0] - corners[0][0][0]
+	dy = corners[last][0][1] - corners[0][0][1]
+
+	easyCorners = []
+	potCorners = []
+
+	# 7x7
+	if diff == 0:
+		potCorners = edgeCorners(corners)
+		return potCorners
+	# 6x6
+	elif diff == 1:
+
+		return potCorners
+	# 5x5
+	elif diff == 2:
+		return potCorners
+	# 4x4
+	elif diff == 4:
+		return potCorners
+	# 3x3
+	elif diff == 5:
+		return potCorners
+	# 2z2
+	elif diff == 6:
+		return potCorners
+
+
+def compareCorners(frame, potCorners):
+	ShiTomasi = cv2.goodFeaturesToTrack(frame, 64, 0.01, 2)
+
+	finalCorners = []
+
+	counter = 0
+	maxCounter = 0
+
+	for i in potCorners:
+		for j in i:
+			for k in ShiTomasi:
+				if j == k:
+					counter = counter + 1
+			if counter > maxCounter:
+				maxCounter = counter
+				finalCorners = i
+		counter = 0
+
+	return finalCorners
+
 def getSubSquare(frame, ROI):
 	pass
 
@@ -267,6 +325,8 @@ cap.set(3, 640)
 cap.set(4, 480)
 print cap.get(3), cap.get(4)
 
+
+temp_inner_corners = 7
 pattern_size = (7,7) # Inner corners of a chessboard
 full_pattern_size = (9,9) # All corners of a chessboard
 # 
@@ -292,10 +352,17 @@ while(True):
 	# When finding corners, performance takes a major hit -> fps drops
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
 	print found
+	if found == False:
+		temp_inner_corners = temp_inner_corners - 1
+			if temp_inner_corners < 1:
+				break
+		pattern_size = (temp_inner_corners, temp_inner_corners)
 	if found:
+		potential_points = extrapolatePotentialPoints(pattern_size, corners);
+		fullCorners = compareCorners(frame, potential_points)
 		break
 
-while(True):
+while(found):
 		# Capture frame-by-frame
 	ret, frame = cap.read()
 
@@ -310,7 +377,8 @@ while(True):
 	print found
 
 	if found:
-		fullCorners = edgeCorners(corners)
+		potential_points = extrapolatePotentialPoints(pattern_size, corners);
+		fullCorners = compareCorners(frame, potential_points)
 
 	# Draws the corners
 	for i in range(0, len(fullCorners[0])):
