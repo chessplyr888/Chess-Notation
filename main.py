@@ -255,8 +255,8 @@ def extrapolatePotentialCorners(pattern_size, corners):
 
 	# print corners
 
-	dx = corners[last][0][0] - corners[0][0][0]
-	dy = corners[last][0][1] - corners[0][0][1]
+	dx = (corners[last][0][0] - corners[0][0][0]) / pattern_size[0]
+	dy = (corners[last][0][1] - corners[0][0][1]) / pattern_size[0]
 
 	easyCorners = []
 	potCorners = []
@@ -265,26 +265,26 @@ def extrapolatePotentialCorners(pattern_size, corners):
 	if diff == 0:
 		potCorners = edgeCorners(corners)
 		return potCorners
-	# 6x6
+	# 6x6 - 8
 	elif diff == 1:
-
+		
 		return potCorners
-	# 5x5
+	# 5x5 - 18
 	elif diff == 2:
 		return potCorners
-	# 4x4
+	# 4x4 - 32
 	elif diff == 4:
 		return potCorners
-	# 3x3
+	# 3x3 - 50
 	elif diff == 5:
 		return potCorners
-	# 2z2
+	# 2z2 - 72
 	elif diff == 6:
 		return potCorners
 
 
 def compareCorners(frame, potCorners):
-	ShiTomasi = cv2.goodFeaturesToTrack(frame, 64, 0.01, 2)
+	ShiTomasi = cv2.goodFeaturesToTrack(frame, 81, 0.01, 2)
 
 	finalCorners = []
 
