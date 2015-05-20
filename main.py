@@ -102,7 +102,7 @@ def edgeCorners(corners):
 
 	fullCorners = np.array([newCorners])
 
-	# fullCorners should be an nparray of shape (64, 1, 2)
+	# fullCorners should be an nparray of shape (1, 81, 2)
 	return fullCorners
 
 
@@ -246,6 +246,8 @@ def getPrimaryColors(frame, ROI, k):
 	return colors, newRoi
 
 
+# Recursive hillclimb
+
 def extrapolatePotentialCorners(pattern_size, corners):
 	# Pattern size ranges from (1,1) to (7,7)
 	diff = pattern_size[0] - full_pattern_size[0]
@@ -258,27 +260,44 @@ def extrapolatePotentialCorners(pattern_size, corners):
 	dx = (corners[last][0][0] - corners[0][0][0]) / pattern_size[0]
 	dy = (corners[last][0][1] - corners[0][0][1]) / pattern_size[0]
 
-	easyCorners = []
+	# potCoreners is the list of potential corners
 	potCorners = []
+
+	rows = []
+	for i in range(0,pattern_size):
+		rows.append((corners[0 + pattern_size*i:pattern_size + pattern_size*i]))
+		# print corners[0 + pattern_size*i:pattern_size + pattern_size*i]
 
 	# 7x7
 	if diff == 0:
 		potCorners = edgeCorners(corners)
 		return potCorners
-	# 6x6 - 8
+	# 6x6 - 4
 	elif diff == 1:
-		
+		upperLeftCorner = [rows[0][0][0] + dx, rows[0][0][1] + dy]
+		upperRow = [upperLeftCorner]
+		potCorners.append(upperLeftCorner)
+		for i in range(0, 8):
+			potCorners.append([upperRow[i][0][0] + dx, upperRow[i][0][1]])
+
+		# Parse through each row
+		for i in range(0, 8):
+			nextLeft = [upperLeftCorner[0][0][0], upperLeftCorner[0][0][1] - dy]
+			potCorners.append(nextLeft)
+			for j in range(0, pattern_size):
+				potCorners.append([])
+
 		return potCorners
-	# 5x5 - 18
+	# 5x5 - 9
 	elif diff == 2:
 		return potCorners
-	# 4x4 - 32
+	# 4x4 - 16
 	elif diff == 4:
 		return potCorners
-	# 3x3 - 50
+	# 3x3 - 25
 	elif diff == 5:
 		return potCorners
-	# 2z2 - 72
+	# 2z2 - 36
 	elif diff == 6:
 		return potCorners
 
