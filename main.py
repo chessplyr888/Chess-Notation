@@ -39,6 +39,7 @@ def getEdgeCornersRows(corners):
 
 	# Return a list of edges on opposite sides
 	return [[lowX, lowY], [highX, highY]]
+	
 
 def getEdgeCornersCols(corners):
 	length = len(corners)
@@ -154,6 +155,7 @@ def grayScale(ROI, base):
 		red = base[ROI[i][0]][ROI[i][1]][0]
 		green = base[ROI[i][0]][ROI[i][1]][1]
 		blue = base[ROI[i][0]][ROI[i][1]][2]
+
 
 		gray = (int)(0.2126*red + 0.7152*green + 0.0722*blue)
 
