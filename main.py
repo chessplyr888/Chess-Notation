@@ -39,7 +39,6 @@ def getEdgeCornersRows(corners):
 
 	# Return a list of edges on opposite sides
 	return [[lowX, lowY], [highX, highY]]
-	
 
 def getEdgeCornersCols(corners):
 	length = len(corners)
@@ -156,7 +155,6 @@ def grayScale(ROI, base):
 		green = base[ROI[i][0]][ROI[i][1]][1]
 		blue = base[ROI[i][0]][ROI[i][1]][2]
 
-
 		gray = (int)(0.2126*red + 0.7152*green + 0.0722*blue)
 
 		base[ROI[i][0]][ROI[i][1]][0] = gray
@@ -249,6 +247,62 @@ def getPrimaryColors(frame, ROI, k):
 
 
 # Recursive hillclimb
+def expandBoard(corners,s,allcorners):
+	foundArray=[]#number corners detected 0-top 1-bottom 2-left 3-right 4-7 corners
+	excorners=corners[:]
+	for i in range(s):
+		corners[i]=0+corners[i]+0
+	corners=[]+corners+[]
+	
+	dx=corners[0][1][0][0]-corners[0][0][0][0]
+	dy=corners[1][0][0][1]-corners[0][0][0][1]
+	
+	#add corners in top row
+	top=[]
+	
+	
+	pass
+	
+	return excorners,foundArray
+
+def recursiveHillClimb(corners,s):
+	allcorners=cv2.goodFeaturesToTrack(frame, 81, 0.01, 2)
+	return recursiveHillClimbPhase2(corners, s, s*s, 1, allcorners)
+	
+# Recursive hillclimb
+def recursiveHillClimbPhase2(corners, s, numfound, lastone, allcorners):#initial call -> numfound=s^2, lastone =1
+	if(s==7)
+		return corners, numfound
+	excorners,foundArray=expandBoard(corners,s,allcorners)
+	#
+	#using the lastone arguement we make sure each board is processed exactly once
+	#top left
+	if(1>=lastone):
+		newCorners1=[ [excorners[i][j][0] for i in range(0,s+1)] for j in range(0,s+1)]
+		bestCorners1,bestValue1=recursiveHillClimbPhase2(newCorners1,s+1,numfound+foundArray[0]+foundArray[2]+foundArray[4],1,allcorners)
+	#top right
+	if(2>=lastone):
+		newCorners2=[ [excorners[i][j][0] for i in range(0,s+1)] for j in range(1,s+2)]
+		bestCorners2,bestValue2=recursiveHillClimbPhase2(newCorners2,s+1,numfound+foundArray[0]+foundArray[3]+foundArray[5],2,allcorners)
+		if(bestValue2>bestValue1)
+			bestCorners1=bestCorners2
+			bestValue1=bestValue2
+	#bottom left
+	if(3>=lastone):
+		newCorners3=[ [excorners[i][j][0] for i in range(1,s)] for j in range(0,s+1)]
+		bestCorners3,bestValue3=recursiveHillClimbPhase2(newCorners3,s+1,numfound+foundArray[1]+foundArray[2]+foundArray[6],3,allcorners)
+		if(bestValue3>bestValue1)
+			bestCorners1=bestCorners3
+			bestValue1=bestValue3
+	#bottom right
+	if(4>=lastone):
+		newCorners4=[ [excorners[i][j][0] for i in range(1,s)] for j in range(1,s+2)]
+		bestCorners4,bestValue4=recursiveHillClimbPhase2(newCorners4,s+1,numfound+foundArray[1]+foundArray[3]+foundArray[7],4,allcorners)
+		if(bestValue4>bestValue1)
+			bestCorners1=bestCorners4
+			bestValue1=bestValue4
+	
+	return bestCorners1, bestValue1
 
 def extrapolatePotentialCorners(pattern_size, corners):
 	# Pattern size ranges from (1,1) to (7,7)
