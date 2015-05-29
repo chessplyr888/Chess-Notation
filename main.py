@@ -248,22 +248,33 @@ def getPrimaryColors(frame, ROI, k):
 
 # Recursive hillclimb
 def expandBoard(corners,s,allcorners):
-	foundArray=[]#number corners detected 0-top 1-bottom 2-left 3-right 4-7 corners
+	foundArray=[0]*8#number corners detected 0-top 1-bottom 2-left 3-right 4-7 corners
 	excorners=corners[:]
 	for i in range(s):
 		corners[i]=0+corners[i]+0
-	corners=[]+corners+[]
+	corners=[0]*(s+2)+corners+[0]*(s+2)
 	
 	dx=corners[0][1][0][0]-corners[0][0][0][0]
 	dy=corners[1][0][0][1]-corners[0][0][0][1]
 	
 	#add corners in top row
 	top=[]
+	#
+	bot=[]
+	#
+	left=[]
+	#
+	right=[]
+	
+	#add corners
 	
 	
-	pass
 	
-	return excorners,foundArray
+	return excorners,foundArray#<-foundArray is 8 integer array
+	#found array indicies:
+	#0-top, 1-bottom, 2-left, 3-right, 4-topleft, 5-topright, 6-bottomleft, 7-bottomright
+	#indicies 0-3 range from 0 to s
+	#indicies 4-7 are either 0 or 1
 
 def recursiveHillClimb(corners,s):
 	allcorners=cv2.goodFeaturesToTrack(frame, 81, 0.01, 2)
