@@ -4,6 +4,7 @@ import cv2
 import time
 from random import randint,choice
 from copy import deepcopy
+import math
 
 
 def checkBounds(axis, val):
@@ -282,7 +283,7 @@ def recursiveHillClimb(corners,s):
 	
 # Recursive hillclimb
 def recursiveHillClimbPhase2(corners, s, numfound, lastone, allcorners):#initial call -> numfound=s^2, lastone =1
-	if(s==7)
+	if(s==7):
 		return corners, numfound
 	excorners,foundArray=expandBoard(corners,s,allcorners)
 	#
@@ -295,21 +296,21 @@ def recursiveHillClimbPhase2(corners, s, numfound, lastone, allcorners):#initial
 	if(2>=lastone):
 		newCorners2=[ [excorners[i][j][0] for i in range(0,s+1)] for j in range(1,s+2)]
 		bestCorners2,bestValue2=recursiveHillClimbPhase2(newCorners2,s+1,numfound+foundArray[0]+foundArray[3]+foundArray[5],2,allcorners)
-		if(bestValue2>bestValue1)
+		if(bestValue2>bestValue1):
 			bestCorners1=bestCorners2
 			bestValue1=bestValue2
 	#bottom left
 	if(3>=lastone):
 		newCorners3=[ [excorners[i][j][0] for i in range(1,s)] for j in range(0,s+1)]
 		bestCorners3,bestValue3=recursiveHillClimbPhase2(newCorners3,s+1,numfound+foundArray[1]+foundArray[2]+foundArray[6],3,allcorners)
-		if(bestValue3>bestValue1)
+		if(bestValue3>bestValue1):
 			bestCorners1=bestCorners3
 			bestValue1=bestValue3
 	#bottom right
 	if(4>=lastone):
 		newCorners4=[ [excorners[i][j][0] for i in range(1,s)] for j in range(1,s+2)]
 		bestCorners4,bestValue4=recursiveHillClimbPhase2(newCorners4,s+1,numfound+foundArray[1]+foundArray[3]+foundArray[7],4,allcorners)
-		if(bestValue4>bestValue1)
+		if(bestValue4>bestValue1):
 			bestCorners1=bestCorners4
 			bestValue1=bestValue4
 	
@@ -368,19 +369,123 @@ def extrapolatePotentialCorners(pattern_size, corners):
 	elif diff == 6:
 		return potCorners
 
+# gives where the subsquare is in the board, needs to be rewritten
+def findPositionofSquareRelativeToTheBoard(square, squareDimensions): # ([(x1,y1), (x2,y2), (x3,y3), (x4,y4)], sidelength = 2) 
+	verticalShift = 0
+	horizontalShift = 0
+	# board's previous max x and max y
+	# xMax, yMax
+	#corner 1 is upper left, corner 2 is upper right, corner 3 is lower left, corner 4 is lower right 
+	lengthX = x2 - x1
+	lengthX2 = x4 - x3
+	lengthX = (lengthX + lengthX2) / 2  # average gets a better value
+	lengthY = y3 - y1
+	lengthY2 = y4 - y2
+	lengthY = (lengthY + lengthY2) / 2
+	# assuming origin is at the lower left corner
+	while x1 < xMax or x2 < xMax :
+		x1 = x1 + lengthX
+		x2 = x2 + lengthX
+		verticalShift = verticalShift + 1
+	verticalShift = verticalShift - 1
+	while y2 < yMax or y4 < yMax :
+		y2 = y2 + lengthY
+		y4 = y4 + lengthY
+		verticalShift = verticalShift + 1
+	horizontalShift = horizontalShift - 1
+	
+	
+
+	return (horizontalShift, verticalShift)
+
+
+def getAllPossibleBoardCorners(square, squareDimensions): 
+	# assume it's a 2x2
+	length = (9 - squareDimensions)
+	#corner 1 is upper left, corner 2 is upper right, corner 3 is lower left, corner 4 is lower right 
+	x1,y1 = square[0]
+	x2,y2 = square[1]
+	x3,y3 = square[2]
+	x4,y4 = square[3]
+
+	lengthX = x2 - x1
+	lengthX2 = x4 - x3
+	lengthX = (lengthX + lengthX2) / (2 * (squareDimensions - 1))
+	lengthY = y3 - y1
+	lengthY2 = y4 - y2
+	lengthY = (lengthY + lengthY2) / (2 * (squareDimensions - 1))
+
+	#sidelength = (lengthX + lengthY) / 2  # average of both sides
+	ratio = 8 / squareDimensions
+	# assuming each square is at the upper left corner
+
+	allPossibleCorners = []
+	# for verticalShift in range (0,length):
+	# 	for horizontalShift in range (0,length):
+	# 		newX1 = x1 + horizontalShift
+	# 		newY1 = y1 + verticalShift
+	# 		newX2 = newX1 + ratio * lengthX
+	# 		newY2 = newY1
+	# 		newY3 = newY1 + ratio * lengthY
+	# 		newX3 = newX1
+	# 		newX4 = newX2
+	# 		newY4 = newY3
+	# 		allPossibleCorners.append([(newX1, newY1),(newX2, newY2),(newX3, newY3),(newX4, newY4)])
+
+
+	for i in range (1, length):
+		for j in range(1, length):
+			tempFullCorners = []
+			newTopLeft = [square[0][0] - (i * lengthX), square[0][1] - (j * lengthY)]
+			for dx in range(0, 9):
+				for dy in range(0, 9):
+					newX = newTopLeft[0] + (dx * lengthX)
+					if newX < 0:
+						newX = 0
+					if newX > cap.get(3):
+						newX = cap.get(3)
+					newY = newTopLeft[1] + (dy * lengthY)
+					if newY < 0:
+						newY = 0
+					if newY > cap.get(4):
+						newY = cap.get(4)
+					tempFullCorners.append((newX, newY))
+
+			allPossibleCorners.append(tempFullCorners)
+
+
+	# problems might occur if there is a big difference in x1 and x3, y2 and y4
+	return allPossibleCorners
+
+
+def dist(x1, y1, x2, y2):
+	distance = math.sqrt(math.pow(x2 - x1, 2) + math.pow(y2 - y1, 2))
+	return distance
+
 
 def compareCorners(frame, potCorners):
-	ShiTomasi = cv2.goodFeaturesToTrack(frame, 81, 0.01, 2)
+	ShiTomasi = cv2.goodFeaturesToTrack(frame, 100, 0.01, 2)
+	# print ShiTomasi
 
 	finalCorners = []
 
 	counter = 0
 	maxCounter = 0
 
+
+	# 100 px threshold
+	threshold = 100
+
 	for i in potCorners:
 		for j in i:
 			for k in ShiTomasi:
-				if j == k:
+				x1 = j[0]
+				y1 = j[1]
+				x2 = k[0][0]
+				y2 = k[0][1]
+				distance = dist(x1, y1, x2, y2)
+				# print distance
+				if dist < threshold:
 					counter = counter + 1
 			if counter > maxCounter:
 				maxCounter = counter
@@ -412,8 +517,8 @@ cap.set(4, 480)
 print cap.get(3), cap.get(4)
 
 
-temp_inner_corners = 7
-pattern_size = (7,7) # Inner corners of a chessboard
+temp_inner_corners = 6
+pattern_size = (6,6) # Inner corners of a chessboard
 full_pattern_size = (9,9) # All corners of a chessboard
 # 
 # 
@@ -429,7 +534,7 @@ while(True):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
 
-	print frame.shape
+	# print frame.shape
 
 	# Our operations on the frame come here
 	base = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -437,98 +542,127 @@ while(True):
 	# findChessboardCorners + drawChessboardCorners
 	# When finding corners, performance takes a major hit -> fps drops
 	found, corners = cv2.findChessboardCorners(frame, pattern_size)
+	
 	print found
+
 	if found == False:
 		temp_inner_corners = temp_inner_corners - 1
-			if temp_inner_corners < 1:
-				break
-		pattern_size = (temp_inner_corners, temp_inner_corners)
-	if found:
-		potential_points = extrapolatePotentialPoints(pattern_size, corners);
-		fullCorners = compareCorners(frame, potential_points)
-		break
-
-while(found):
-		# Capture frame-by-frame
-	ret, frame = cap.read()
-
-	print frame.shape
-
-	# Our operations on the frame come here
-	base = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-	# findChessboardCorners + drawChessboardCorners
-	# When finding corners, performance takes a major hit -> fps drops
-	found, corners = cv2.findChessboardCorners(frame, pattern_size)
-	print found
-
-	if found:
-		potential_points = extrapolatePotentialPoints(pattern_size, corners);
-		fullCorners = compareCorners(frame, potential_points)
-
-	# Draws the corners
-	for i in range(0, len(fullCorners[0])):
-		# print fullCorners
-		x = int(fullCorners[0][i][0])
-		y = int(fullCorners[0][i][1])
-		cv2.circle(frame, (x, y), 5, (0, 255, 0), -1) # Green Points
-
-	# Get the contours
-	contours = getContourList(fullCorners)
-
-	# Draw the contours
-	cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
-
-	# Get the average color of the square
-	colorOfSquare = []
-
-	# Pixels of the entire board
-	fullBoardROI = []
-
-	# Test Case For A Single Countour (Square)
-	pointsInContour = []
-
-	# List of all bounding boxes
-	boxes = []
-
-	getBoxTimeStart = time.time()
-	for i in range(0, 64):
-		x, y, w, h = boundingBox(contours[i])
-		boxes.append([x, y, w, h])
-		squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
-	getBoxTimeEnd = time.time()
-
-	print "Load Image Time: %f" %(getBoxTimeEnd - getBoxTimeStart)
-
-	# Gets all the points in every contour and adds them to the custom full board ROI
-	getPointsTimeStart = time.time()
-	for k in range(0, 64):
-		for i in range(x, x + w):
-			for j in range(y, y + h):
-				if(cv2.pointPolygonTest(contours[k], (i, j), False) == 1):
-					fullBoardROI.append((i, j))
-	getPointsTimeEnd = time.time()
-
-	print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
-
-
-
-	# K-Means N Color Image
-	primeColors, newROI = getPrimaryColors(frame, fullBoardROI, 4)
-
-	print primeColors
+		if temp_inner_corners < 4:
+			pattern_size = (7, 7)
+		else:
+			pattern_size = (temp_inner_corners, temp_inner_corners)
 	
-	# print fullBoardROI
-	getPrintTimeStart = time.time()
-	p=0
-	for k in range(0, 64):
-		for i in range(x, x + w):
-			for j in range(y, y + h):
-				frame[i,j]=newROI[p]
-				p+=1
-	getPrintTimeEnd = time.time()
+	if found:
+		tempSquare = [corners[0][0], corners[pattern_size[0] - 1][0], corners[pattern_size[0] * pattern_size[0] - pattern_size[0]][0], corners[pattern_size[0] * pattern_size[0] - 1][0]]
+		potential_points = getAllPossibleBoardCorners(tempSquare, pattern_size[0]);
 
-	print "Calculate Print Full Board ROI Time: %f" %(getPrintTimeEnd - getPrintTimeStart)
+		if(len(potential_points) > 1):
+			fullCorners = compareCorners(base, potential_points)
+		else:
+			fullCorners = potential_points[0]
+		# print fullCorners
+
+
+	while(found):
+		# Capture frame-by-frame
+		ret, frame = cap.read()
+
+		# print frame.shape
+
+		# Our operations on the frame come here
+		base = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+		# findChessboardCorners + drawChessboardCorners
+		# When finding corners, performance takes a major hit -> fps drops
+		found, corners = cv2.findChessboardCorners(frame, pattern_size)
+		
+		print found
+
+		if found == False:
+			temp_inner_corners = temp_inner_corners - 1
+			if temp_inner_corners < 4:
+				pattern_size = (7, 7)
+			else:
+				pattern_size = (temp_inner_corners, temp_inner_corners)
+		
+		if found:
+			tempSquare = [corners[0][0], corners[pattern_size[0] - 1][0], corners[pattern_size[0] * pattern_size[0] - pattern_size[0] + 1][0], corners[pattern_size[0] * pattern_size[0] - 1][0]]
+			potential_points = getAllPossibleBoardCorners(tempSquare, pattern_size[0]);
+
+			# print potential_points
+
+			if(len(potential_points) > 1):
+				fullCorners = compareCorners(base, potential_points)
+			else:
+				fullCorners = potential_points[0]
+			print fullCorners
+
+		# Draws the corners
+		# print len(fullCorners)
+		for i in range(0, len(fullCorners)):
+			x = int(fullCorners[i][0])
+			y = int(fullCorners[i][1])
+			cv2.circle(frame, (x, y), 5, (0, 255, 0), -1) # Green Points
+
+		cv2.imshow('newROI', frame)
+
+
+		# # Get the contours
+		# contours = getContourList(fullCorners)
+
+		# # Draw the contours
+		# cv2.drawContours(frame, contours, -1, (0, 0, 255), 2) # Red Contours
+
+		# # Get the average color of the square
+		# colorOfSquare = []
+
+		# # Pixels of the entire board
+		# fullBoardROI = []
+
+		# # Test Case For A Single Countour (Square)
+		# pointsInContour = []
+
+		# # List of all bounding boxes
+		# boxes = []
+
+		# getBoxTimeStart = time.time()
+		# for i in range(0, 64):
+		# 	x, y, w, h = boundingBox(contours[i])
+		# 	boxes.append([x, y, w, h])
+		# 	squareImg = cv2.rectangle(frame, (x,y), (x + w, y + h), (255, 0, 0), 2)		
+		# getBoxTimeEnd = time.time()
+
+		# print "Load Image Time: %f" %(getBoxTimeEnd - getBoxTimeStart)
+
+		# # Gets all the points in every contour and adds them to the custom full board ROI
+		# getPointsTimeStart = time.time()
+		# for k in range(0, 64):
+		# 	for i in range(x, x + w):
+		# 		for j in range(y, y + h):
+		# 			if(cv2.pointPolygonTest(contours[k], (i, j), False) == 1):
+		# 				fullBoardROI.append((i, j))
+		# getPointsTimeEnd = time.time()
+
+		# print "Calculate Points Time: %f" %(getPointsTimeEnd - getPointsTimeStart)
+
+
+
+	# # K-Means N Color Image
+	# primeColors, newROI = getPrimaryColors(frame, fullBoardROI, 4)
+
+	# print primeColors
+	
+	# # print fullBoardROI
+	# getPrintTimeStart = time.time()
+	# p=0
+	# for k in range(0, 64):
+	# 	for i in range(x, x + w):
+	# 		for j in range(y, y + h):
+	# 			frame[i,j]=newROI[p]
+	# 			p+=1
+	# getPrintTimeEnd = time.time()
+
+	# print "Calculate Print Full Board ROI Time: %f" %(getPrintTimeEnd - getPrintTimeStart)
 
 	# Get binary color mask of fullBoardROI -> TODO
 	# mask = frame[x: x + w, y: y + h]
